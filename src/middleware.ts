@@ -1,15 +1,14 @@
+// middleware.ts
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export const config = {
   matcher: ['/admin/:path*', '/dashboard/:path*'],
 }
 
 export async function middleware(req: NextRequest) {
-  const supabase = createServerComponentClient({ cookies: () => cookies() })
-
+  const supabase = await createSupabaseServerClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -18,7 +17,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', req.url))
   }
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/role`, {
+  const res = await fetch(`${req.nextUrl.origin}/api/auth/role`, {
     headers: {
       cookie: req.headers.get('cookie') ?? '',
     },

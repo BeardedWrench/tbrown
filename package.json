@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "sync": "ts-node scripts/dev-sync.ts",
+    "build": "npm run generate:types && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -14,7 +15,6 @@
   "dependencies": {
     "@auth/supabase-adapter": "^1.10.0",
     "@prisma/client": "^6.11.1",
-    "@supabase/auth-helpers-nextjs": "^0.10.0",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.50.3",
     "@tailwindcss/typography": "^0.5.16",

@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
-import { getSupabaseRouteClient } from '@/lib/supabase/routeClient'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 const prisma = new PrismaClient()
 
-export async function GET() {
-  const supabase = getSupabaseRouteClient()
+export async function GET(req: Request) {
+  const supabase = await createSupabaseServerClient()
 
   const {
     data: { user },

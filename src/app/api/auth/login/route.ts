@@ -1,16 +1,15 @@
 import { NextResponse } from 'next/server'
-import { getSupabaseRouteClient } from '@/lib/supabase/routeClient'
+import { createSupabaseServerClient } from '@/lib/supabase/server'
 
 export async function POST(req: Request) {
-  const res = NextResponse.json({ success: true })
-  const supabase = getSupabaseRouteClient()
-
+  const supabase = await createSupabaseServerClient()
   const { email, password } = await req.json()
+
   const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
   if (error || !data.session) {
     return NextResponse.json({ error: error?.message || 'Login failed' }, { status: 400 })
   }
 
-  return res
+  return NextResponse.json({ success: true })
 }
