@@ -93,6 +93,30 @@ export type Database = {
         }
         Relationships: []
       }
+      FeatureFlag: {
+        Row: {
+          createdAt: string
+          enabled: boolean
+          id: string
+          key: string
+          updatedAt: string
+        }
+        Insert: {
+          createdAt?: string
+          enabled?: boolean
+          id: string
+          key: string
+          updatedAt: string
+        }
+        Update: {
+          createdAt?: string
+          enabled?: boolean
+          id?: string
+          key?: string
+          updatedAt?: string
+        }
+        Relationships: []
+      }
       Post: {
         Row: {
           authorId: string
@@ -219,6 +243,30 @@ export type Database = {
         Update: {
           id?: string
           name?: string
+        }
+        Relationships: []
+      }
+      Setting: {
+        Row: {
+          createdAt: string
+          id: string
+          key: string
+          updatedAt: string
+          value: string
+        }
+        Insert: {
+          createdAt?: string
+          id: string
+          key: string
+          updatedAt: string
+          value: string
+        }
+        Update: {
+          createdAt?: string
+          id?: string
+          key?: string
+          updatedAt?: string
+          value?: string
         }
         Relationships: []
       }

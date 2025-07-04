@@ -28,7 +28,7 @@ BEGIN
   FOR rec IN
     SELECT tablename, policyname
     FROM pg_policies
-    WHERE tablename IN ('Post', 'Project', 'Tutorial', 'Category', 'Tag', 'User', 'Role')
+    WHERE tablename IN ('Post', 'Project', 'Tutorial', 'Category', 'Tag', 'User', 'Role', 'FeatureFlag', 'Setting')
   LOOP
     EXECUTE format(
       'DROP POLICY IF EXISTS %I ON %I',
@@ -37,6 +37,26 @@ BEGIN
     );
   END LOOP;
 END $$;
+
+-- ====================
+-- FEATUREFLAG Table Policies
+-- ====================
+ALTER TABLE "FeatureFlag" ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admin full feature flags"
+  ON "FeatureFlag" FOR ALL
+  USING (is_admin())
+  WITH CHECK (is_admin());
+
+-- ====================
+-- SETTING Table Policies
+-- ====================
+ALTER TABLE "Setting" ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Admin full settings"
+  ON "Setting" FOR ALL
+  USING (is_admin())
+  WITH CHECK (is_admin());
 
 -- ====================
 -- POST Table Policies
