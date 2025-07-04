@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator seed {
+  provider = "ts-node"
+  output   = "./seed.ts"
+}
+
+model Role {
+  id    String  @id @default(cuid())
+  name  String  @unique
+  users User[]
+}
+
+
+model User {
+  id          String   @id 
+  email       String   @unique
+  roleId    String
+  role      Role     @relation(fields: [roleId], references: [id])
+  name        String?
+  avatarUrl   String?
+  createdAt   DateTime @default(now())
+
+  posts       Post[]
+  projects    Project[]
+  tutorials   Tutorial[]
+}
+
+model Post {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  content     String
+  excerpt     String?
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+  tags        Tag[]     @relation("PostTags")
+}
+
+model Project {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  description String
+  url         String?
+  repo        String?
+  techStack   String[]
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+}
+
+model Tutorial {
+  id          String   @id @default(uuid())
+  title       String
+  slug        String   @unique
+  difficulty  Difficulty
+  tags        String[]
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+}
+
+model Category {
+  id        String     @id @default(uuid())
+  name      String
+  slug      String     @unique
+  createdAt DateTime   @default(now())
+
+  posts     Post[]
+  projects  Project[]
+  tutorials Tutorial[]
+}
+
+model Tag {
+  id    String @id @default(uuid())
+  name  String
+  slug  String @unique
+  posts Post[] @relation("PostTags")
+}
+
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
