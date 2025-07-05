@@ -57,10 +57,10 @@ export function SiteNavbar() {
   );
 
   return (
-    <nav className="w-full border-b bg-white px-6 py-4 shadow-sm">
+    <nav className="w-full border-b bg-white px-6 py-4 shadow-sm/2 mb-4">
       <div className="mx-auto flex max-w-6xl items-center justify-between">
-        <Link href="/" className="text-xl font-bold">
-          BeardedWrench
+        <Link href="/" className="text-xl font-bold text-gray-700">
+          Terry Brown
         </Link>
 
         {/* Desktop */}

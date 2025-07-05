@@ -1,14 +1,34 @@
-import { createSupabaseServerClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
-import DashboardClient from './DashboardClient'
+import { prisma } from '@/lib/prisma';
+import DashboardClient from './DashboardClient';
+// import { getUserFromRequest } from '@/lib/auth/getUserFromRequest';
+import { redirect } from 'next/navigation';
+import { createSupabaseServerClientFromHeaders } from '@/lib/supabase/server';
 
 export default async function DashboardPage() {
-  const supabase = await createSupabaseServerClient()
+  const supabase = await createSupabaseServerClientFromHeaders();
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
-  if (!user) redirect('/auth/login')
+  // const user = await getUserFromRequest();
+  if (!user) redirect('/auth/login');
 
-  return <DashboardClient user={user} />
+  const [posts, projects, tutorials, users] = await Promise.all([
+    prisma.post.count(),
+    prisma.project.count(),
+    prisma.tutorial.count(),
+    prisma.user.count(),
+  ]);
+
+  return (
+    <DashboardClient
+      user={user}
+      stats={{
+        posts,
+        projects,
+        tutorials,
+        users,
+      }}
+    />
+  );
 }

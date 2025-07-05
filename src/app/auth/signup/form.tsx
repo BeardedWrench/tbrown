@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export default function SignUpForm() {
   const [email, setEmail] = useState('');
@@ -12,18 +13,20 @@ export default function SignUpForm() {
   async function handleSignUp(e: React.FormEvent) {
     e.preventDefault();
 
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      body: JSON.stringify({ email, password, name }),
-    });
+    const supabase = createSupabaseBrowserClient();
+    const { data, error } = await supabase.auth.signUp({ email, password });
 
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error || 'Signup failed');
+    if (error || !data.user) {
+      alert(error?.message || 'Signup failed');
       return;
     }
 
-    router.push('/auth/login');
+    await fetch('/api/auth/sync-user', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    });
+
+    router.push('/admin/dashboard');
   }
 
   return (

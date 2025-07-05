@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClientFromHeaders } from '@/lib/supabase/server';
 
 export const config = {
   matcher: ['/admin/:path*', '/dashboard/:path*'],
 };
 
 export async function middleware(req: NextRequest) {
-  const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClientFromHeaders();
   const {
     data: { user },
   } = await supabase.auth.getUser();

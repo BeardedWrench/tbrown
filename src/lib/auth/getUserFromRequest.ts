@@ -1,11 +1,11 @@
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createSupabaseServerClientFromHeaders } from '@/lib/supabase/server';
 import { PrismaClient } from '@prisma/client';
 import type { DBUser } from '@/types/user';
 
 const prisma = new PrismaClient();
 
 export async function getUserFromRequest(): Promise<DBUser | null> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = await createSupabaseServerClientFromHeaders();
   const {
     data: { user },
     error,

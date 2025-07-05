@@ -1,22 +1,21 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export default function LoginPage() {
   const supabase = createSupabaseBrowserClient();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  // Redirect if already logged in
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
-        router.replace("/admin/dashboard");
+        router.replace('/admin/dashboard');
       }
     });
   }, []);
@@ -26,21 +25,19 @@ export default function LoginPage() {
     setLoading(true);
     setError(null);
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
-    const data = await res.json();
     setLoading(false);
 
-    if (!res.ok) {
-      setError(data.error || "Login failed");
+    if (error || !data.session) {
+      setError(error?.message || 'Login failed');
     } else {
-      router.push("/admin/dashboard");
+      router.push('/admin/dashboard');
     }
   }
-
   return (
     <form
       onSubmit={handleLogin}
@@ -72,7 +69,7 @@ export default function LoginPage() {
         disabled={loading}
         className="bg-black text-white p-2 w-full rounded hover:bg-gray-900"
       >
-        {loading ? "Logging in..." : "Login"}
+        {loading ? 'Logging in...' : 'Login'}
       </button>
     </form>
   );

@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import {
-  getBlogPosts,
+  getPublishedBlogPosts,
   getBlogCategories,
   getBlogPostCount,
 } from '@/lib/blog/data';
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const pageSize = 6;
 
   const [postsData, categories] = await Promise.all([
-    getBlogPosts({ category, page, pageSize }),
+    getPublishedBlogPosts({ category, page, pageSize }),
     getBlogCategories(),
   ]);
 

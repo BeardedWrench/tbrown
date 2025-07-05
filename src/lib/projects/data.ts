@@ -37,6 +37,18 @@ export async function getCategoryBySlug(slug: string) {
     where: { slug },
   });
 }
+
 export async function getProjectCategoryBySlug(slug: string) {
   return prisma.projectCategory.findUnique({ where: { slug } });
+}
+
+export async function getRecentProjects(limit = 3) {
+  return prisma.project.findMany({
+    where: { featured: true },
+    take: limit,
+    orderBy: { createdAt: 'desc' },
+    include: {
+      category: true,
+    },
+  });
 }
