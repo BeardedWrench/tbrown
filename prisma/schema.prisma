@@ -36,9 +36,9 @@ model Post {
   createdAt  DateTime  @default(now())
   updatedAt  DateTime  @updatedAt
   authorId   String
-  categoryId String?
   author     User      @relation(fields: [authorId], references: [id])
-  category   Category? @relation(fields: [categoryId], references: [id])
+  postCategoryId String?
+  category       PostCategory? @relation(fields: [postCategoryId], references: [id])
   tags       Tag[]     @relation("PostTags")
   coverImage String?
 }
@@ -48,6 +48,7 @@ model Project {
   title       String
   slug        String    @unique
   description String
+  coverImage  String?
   url         String?
   repo        String?
   techStack   String[]
@@ -55,9 +56,9 @@ model Project {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   authorId    String
-  categoryId  String?
   author      User      @relation(fields: [authorId], references: [id])
-  category    Category? @relation(fields: [categoryId], references: [id])
+  projectCategoryId String?
+  category          ProjectCategory? @relation(fields: [projectCategoryId], references: [id])
 }
 
 model Tutorial {
@@ -70,19 +71,9 @@ model Tutorial {
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt
   authorId   String
-  categoryId String?
   author     User       @relation(fields: [authorId], references: [id])
-  category   Category?  @relation(fields: [categoryId], references: [id])
-}
-
-model Category {
-  id        String     @id @default(uuid())
-  name      String
-  slug      String     @unique
-  createdAt DateTime   @default(now())
-  posts     Post[]
-  projects  Project[]
-  tutorials Tutorial[]
+  tutorialCategoryId String?
+  category           TutorialCategory? @relation(fields: [tutorialCategoryId], references: [id])
 }
 
 model Tag {
@@ -112,4 +103,28 @@ enum Difficulty {
   BEGINNER
   INTERMEDIATE
   ADVANCED
+}
+
+model PostCategory {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  posts     Post[]
+}
+
+model ProjectCategory {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  projects  Project[]
+}
+
+model TutorialCategory {
+  id        String   @id @default(uuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  tutorials Tutorial[]
 }

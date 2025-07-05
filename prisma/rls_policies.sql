@@ -28,7 +28,7 @@ BEGIN
   FOR rec IN
     SELECT tablename, policyname
     FROM pg_policies
-    WHERE tablename IN ('Post', 'Project', 'Tutorial', 'Category', 'Tag', 'User', 'Role', 'FeatureFlag', 'Setting')
+    WHERE tablename IN ('Post', 'Project', 'Tutorial', 'PostCategory', 'TutorialCategory', 'ProjectCategory', 'Tag', 'User', 'Role', 'FeatureFlag', 'Setting')
   LOOP
     EXECUTE format(
       'DROP POLICY IF EXISTS %I ON %I',
@@ -37,6 +37,91 @@ BEGIN
     );
   END LOOP;
 END $$;
+
+-- ====================
+-- PostCategory Table Policies
+-- ====================
+ALTER TABLE "PostCategory" ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read post categories"
+  ON "PostCategory" FOR SELECT
+  USING (true);
+
+CREATE POLICY "Editor write post categories"
+  ON "PostCategory" FOR INSERT
+  WITH CHECK (is_editor());
+
+CREATE POLICY "Editor update post categories"
+  ON "PostCategory" FOR UPDATE
+  USING (is_editor());
+
+CREATE POLICY "Admin write post categories"
+  ON "PostCategory" FOR INSERT
+  WITH CHECK (is_admin());
+
+CREATE POLICY "Admin update post categories"
+  ON "PostCategory" FOR UPDATE
+  USING (is_admin());
+
+CREATE POLICY "Admin delete post categories"
+  ON "PostCategory" FOR DELETE
+  USING (is_admin());
+-- ====================
+-- ProjectCategory Table Policies
+-- ====================
+ALTER TABLE "ProjectCategory" ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read project categories"
+  ON "ProjectCategory" FOR SELECT
+  USING (true);
+
+CREATE POLICY "Editor write project categories"
+  ON "ProjectCategory" FOR INSERT
+  WITH CHECK (is_editor());
+
+CREATE POLICY "Editor update project categories"
+  ON "ProjectCategory" FOR UPDATE
+  USING (is_editor());
+
+CREATE POLICY "Admin write project categories"
+  ON "ProjectCategory" FOR INSERT
+  WITH CHECK (is_admin());
+
+CREATE POLICY "Admin update project categories"
+  ON "ProjectCategory" FOR UPDATE
+  USING (is_admin());
+
+CREATE POLICY "Admin delete project categories"
+  ON "ProjectCategory" FOR DELETE
+  USING (is_admin());
+-- ====================
+-- TutorialCategory Table Policies
+-- ====================
+ALTER TABLE "TutorialCategory" ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Public read tutorial categories"
+  ON "TutorialCategory" FOR SELECT
+  USING (true);
+
+CREATE POLICY "Editor write tutorial categories"
+  ON "TutorialCategory" FOR INSERT
+  WITH CHECK (is_editor());
+
+CREATE POLICY "Editor update tutorial categories"
+  ON "TutorialCategory" FOR UPDATE
+  USING (is_editor());
+
+CREATE POLICY "Admin write tutorial categories"
+  ON "TutorialCategory" FOR INSERT
+  WITH CHECK (is_admin());
+
+CREATE POLICY "Admin update tutorial categories"
+  ON "TutorialCategory" FOR UPDATE
+  USING (is_admin());
+
+CREATE POLICY "Admin delete tutorial categories"
+  ON "TutorialCategory" FOR DELETE
+  USING (is_admin());
 
 -- ====================
 -- FEATUREFLAG Table Policies
@@ -143,35 +228,6 @@ CREATE POLICY "Admin update tutorials"
 
 CREATE POLICY "Admin delete tutorials"
   ON "Tutorial" FOR DELETE
-  USING (is_admin());
-
--- ====================
--- CATEGORY Table Policies
--- ====================
-ALTER TABLE "Category" ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "Public read categories"
-  ON "Category" FOR SELECT
-  USING (true);
-
-CREATE POLICY "Editor write categories"
-  ON "Category" FOR INSERT
-  WITH CHECK (is_editor());
-
-CREATE POLICY "Editor update categories"
-  ON "Category" FOR UPDATE
-  USING (is_editor());
-
-CREATE POLICY "Admin write categories"
-  ON "Category" FOR INSERT
-  WITH CHECK (is_admin());
-
-CREATE POLICY "Admin update categories"
-  ON "Category" FOR UPDATE
-  USING (is_admin());
-
-CREATE POLICY "Admin delete categories"
-  ON "Category" FOR DELETE
   USING (is_admin());
 
 -- ====================

@@ -18,7 +18,6 @@ import { isAdmin } from '@/lib/auth/roles';
 import { useUserStore } from '@/lib/store/userStore';
 
 const navLinks = [
-  { href: '/', label: 'Home' },
   { href: '/blog', label: 'Blog' },
   { href: '/projects', label: 'Projects' },
   { href: '/tutorials', label: 'Tutorials' },
@@ -61,7 +60,7 @@ export function SiteNavbar() {
     <nav className="w-full border-b bg-white px-6 py-4 shadow-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between">
         <Link href="/" className="text-xl font-bold">
-          Terry Brown
+          BeardedWrench
         </Link>
 
         {/* Desktop */}

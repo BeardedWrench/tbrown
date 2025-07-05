@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { BlogCard } from './components/BlogCard';
 import { BlogFilter } from './components/BlogFilter';
 import { BlogPagination } from './components/BlogPagination';
-import { Category, Post } from '@prisma/client';
+import { Post, PostCategory } from '@prisma/client';
 
 export function Blog() {
   const searchParams = useSearchParams();
@@ -15,7 +15,7 @@ export function Blog() {
 
   const [data, setData] = useState<{
     posts: Post[];
-    categories: Category[];
+    categories: PostCategory[];
     total: number;
   } | null>(null);
 

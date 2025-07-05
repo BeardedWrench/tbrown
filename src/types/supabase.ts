@@ -72,27 +72,6 @@ export type Database = {
         }
         Relationships: []
       }
-      Category: {
-        Row: {
-          createdAt: string
-          id: string
-          name: string
-          slug: string
-        }
-        Insert: {
-          createdAt?: string
-          id: string
-          name: string
-          slug: string
-        }
-        Update: {
-          createdAt?: string
-          id?: string
-          name?: string
-          slug?: string
-        }
-        Relationships: []
-      }
       FeatureFlag: {
         Row: {
           createdAt: string
@@ -120,12 +99,12 @@ export type Database = {
       Post: {
         Row: {
           authorId: string
-          categoryId: string | null
           content: string
           coverImage: string | null
           createdAt: string
           excerpt: string | null
           id: string
+          postCategoryId: string | null
           published: boolean
           slug: string
           title: string
@@ -133,12 +112,12 @@ export type Database = {
         }
         Insert: {
           authorId: string
-          categoryId?: string | null
           content: string
           coverImage?: string | null
           createdAt?: string
           excerpt?: string | null
           id: string
+          postCategoryId?: string | null
           published?: boolean
           slug: string
           title: string
@@ -146,12 +125,12 @@ export type Database = {
         }
         Update: {
           authorId?: string
-          categoryId?: string | null
           content?: string
           coverImage?: string | null
           createdAt?: string
           excerpt?: string | null
           id?: string
+          postCategoryId?: string | null
           published?: boolean
           slug?: string
           title?: string
@@ -166,22 +145,44 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "Post_categoryId_fkey"
-            columns: ["categoryId"]
+            foreignKeyName: "Post_postCategoryId_fkey"
+            columns: ["postCategoryId"]
             isOneToOne: false
-            referencedRelation: "Category"
+            referencedRelation: "PostCategory"
             referencedColumns: ["id"]
           },
         ]
       }
+      PostCategory: {
+        Row: {
+          createdAt: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          createdAt?: string
+          id: string
+          name: string
+          slug: string
+        }
+        Update: {
+          createdAt?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
       Project: {
         Row: {
           authorId: string
-          categoryId: string | null
+          coverImage: string | null
           createdAt: string
           description: string
           featured: boolean
           id: string
+          projectCategoryId: string | null
           repo: string | null
           slug: string
           techStack: string[] | null
@@ -191,11 +192,12 @@ export type Database = {
         }
         Insert: {
           authorId: string
-          categoryId?: string | null
+          coverImage?: string | null
           createdAt?: string
           description: string
           featured?: boolean
           id: string
+          projectCategoryId?: string | null
           repo?: string | null
           slug: string
           techStack?: string[] | null
@@ -205,11 +207,12 @@ export type Database = {
         }
         Update: {
           authorId?: string
-          categoryId?: string | null
+          coverImage?: string | null
           createdAt?: string
           description?: string
           featured?: boolean
           id?: string
+          projectCategoryId?: string | null
           repo?: string | null
           slug?: string
           techStack?: string[] | null
@@ -226,13 +229,34 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "Project_categoryId_fkey"
-            columns: ["categoryId"]
+            foreignKeyName: "Project_projectCategoryId_fkey"
+            columns: ["projectCategoryId"]
             isOneToOne: false
-            referencedRelation: "Category"
+            referencedRelation: "ProjectCategory"
             referencedColumns: ["id"]
           },
         ]
+      }
+      ProjectCategory: {
+        Row: {
+          createdAt: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          createdAt?: string
+          id: string
+          name: string
+          slug: string
+        }
+        Update: {
+          createdAt?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
       }
       Role: {
         Row: {
@@ -294,7 +318,6 @@ export type Database = {
       Tutorial: {
         Row: {
           authorId: string
-          categoryId: string | null
           content: string
           createdAt: string
           difficulty: Database["public"]["Enums"]["Difficulty"]
@@ -302,11 +325,11 @@ export type Database = {
           slug: string
           tags: string[] | null
           title: string
+          tutorialCategoryId: string | null
           updatedAt: string
         }
         Insert: {
           authorId: string
-          categoryId?: string | null
           content: string
           createdAt?: string
           difficulty: Database["public"]["Enums"]["Difficulty"]
@@ -314,11 +337,11 @@ export type Database = {
           slug: string
           tags?: string[] | null
           title: string
+          tutorialCategoryId?: string | null
           updatedAt: string
         }
         Update: {
           authorId?: string
-          categoryId?: string | null
           content?: string
           createdAt?: string
           difficulty?: Database["public"]["Enums"]["Difficulty"]
@@ -326,6 +349,7 @@ export type Database = {
           slug?: string
           tags?: string[] | null
           title?: string
+          tutorialCategoryId?: string | null
           updatedAt?: string
         }
         Relationships: [
@@ -337,13 +361,34 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "Tutorial_categoryId_fkey"
-            columns: ["categoryId"]
+            foreignKeyName: "Tutorial_tutorialCategoryId_fkey"
+            columns: ["tutorialCategoryId"]
             isOneToOne: false
-            referencedRelation: "Category"
+            referencedRelation: "TutorialCategory"
             referencedColumns: ["id"]
           },
         ]
+      }
+      TutorialCategory: {
+        Row: {
+          createdAt: string
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          createdAt?: string
+          id: string
+          name: string
+          slug: string
+        }
+        Update: {
+          createdAt?: string
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
       }
       User: {
         Row: {
@@ -385,7 +430,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      is_editor: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
     }
     Enums: {
       Difficulty: "BEGINNER" | "INTERMEDIATE" | "ADVANCED"
