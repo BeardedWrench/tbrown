@@ -1,0 +1,47 @@
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { PrismaClient } from '@prisma/client';
+import type { DBUser } from '@/types/user';
+
+const prisma = new PrismaClient();
+
+export async function getUserFromRequest(): Promise<DBUser | null> {
+  const supabase = await createSupabaseServerClient();
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) return null;
+
+  const dbUser = await prisma.user.findUnique({
+    where: { id: user.id },
+    include: { role: true },
+  });
+
+  if (!dbUser || !dbUser.role) return null;
+
+  return {
+    id: dbUser.id,
+    email: dbUser.email,
+    name: dbUser.name,
+    avatarUrl: dbUser.avatarUrl,
+    role: dbUser.role.name,
+  };
+}
+
+export async function getUserByID(id: string): Promise<DBUser | null> {
+  const dbUser = await prisma.user.findUnique({
+    where: { id },
+    include: { role: true },
+  });
+
+  if (!dbUser) return null;
+
+  return {
+    id: dbUser.id,
+    email: dbUser.email,
+    name: dbUser.name,
+    avatarUrl: dbUser.avatarUrl,
+    role: dbUser.role.name,
+  };
+}

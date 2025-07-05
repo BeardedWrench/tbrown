@@ -122,6 +122,7 @@ export type Database = {
           authorId: string
           categoryId: string | null
           content: string
+          coverImage: string | null
           createdAt: string
           excerpt: string | null
           id: string
@@ -134,6 +135,7 @@ export type Database = {
           authorId: string
           categoryId?: string | null
           content: string
+          coverImage?: string | null
           createdAt?: string
           excerpt?: string | null
           id: string
@@ -146,6 +148,7 @@ export type Database = {
           authorId?: string
           categoryId?: string | null
           content?: string
+          coverImage?: string | null
           createdAt?: string
           excerpt?: string | null
           id?: string
@@ -382,14 +385,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      is_admin: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
-      is_editor: {
-        Args: Record<PropertyKey, never>
-        Returns: boolean
-      }
+      [_ in never]: never
     }
     Enums: {
       Difficulty: "BEGINNER" | "INTERMEDIATE" | "ADVANCED"

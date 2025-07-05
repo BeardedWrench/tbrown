@@ -1,57 +1,13 @@
-"use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { redirect } from 'next/navigation';
+import SignUpForm from './form';
+import { isSignupEnabled } from '@/lib/utils/settings';
 
-export default function SignUpPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const router = useRouter();
+export default async function SignUpPage() {
+  const allowed = await isSignupEnabled();
 
-  async function handleSignUp(e: React.FormEvent) {
-    e.preventDefault();
-
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      body: JSON.stringify({ email, password, name }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) {
-      alert(data.error || "Signup failed");
-      return;
-    }
-
-    router.push("/auth/login");
+  if (!allowed) {
+    redirect('/auth/login');
   }
 
-  return (
-    <form onSubmit={handleSignUp} className="max-w-md mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-bold">Sign Up</h1>
-      <input
-        className="border w-full p-2"
-        type="text"
-        placeholder="Full Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
-      <input
-        className="border w-full p-2"
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        className="border w-full p-2"
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button type="submit" className="bg-black text-white w-full p-2">
-        Sign Up
-      </button>
-    </form>
-  );
+  return <SignUpForm />;
 }
