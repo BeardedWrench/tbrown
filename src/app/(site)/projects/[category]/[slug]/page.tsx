@@ -90,10 +90,6 @@ export default async function ProjectDetailPage(_: Props) {
           </Link>
         )}
       </div>
-
-      <div className="mt-10 text-sm text-gray-500">
-        Built by <strong>{project.author?.name ?? 'Unknown'}</strong>
-      </div>
     </section>
   );
 }

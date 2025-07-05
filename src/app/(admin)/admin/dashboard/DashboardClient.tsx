@@ -1,10 +1,10 @@
 'use client';
 
-import { User } from '@supabase/supabase-js';
 import { AdminStatCard } from '../components/AdminStatCard';
+import { DBUser } from '@/types/user';
 
 interface Props {
-  user: User;
+  user: DBUser;
   stats: {
     posts: number;
     projects: number;
@@ -23,7 +23,7 @@ export default function DashboardClient({ user, stats }: Props) {
 
   return (
     <div className="p-6 space-y-8">
-      <h1 className="text-2xl font-bold">Welcome, {user.email}</h1>
+      <h1 className="text-2xl font-bold">Welcome, {user.name}</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map(({ name, href, count }) => (

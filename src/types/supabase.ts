@@ -72,6 +72,36 @@ export type Database = {
         }
         Relationships: []
       }
+      _TutorialTags: {
+        Row: {
+          A: string
+          B: string
+        }
+        Insert: {
+          A: string
+          B: string
+        }
+        Update: {
+          A?: string
+          B?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "_TutorialTags_A_fkey"
+            columns: ["A"]
+            isOneToOne: false
+            referencedRelation: "Tag"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "_TutorialTags_B_fkey"
+            columns: ["B"]
+            isOneToOne: false
+            referencedRelation: "Tutorial"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       FeatureFlag: {
         Row: {
           createdAt: string
@@ -323,7 +353,6 @@ export type Database = {
           difficulty: Database["public"]["Enums"]["Difficulty"]
           id: string
           slug: string
-          tags: string[] | null
           title: string
           tutorialCategoryId: string | null
           updatedAt: string
@@ -335,7 +364,6 @@ export type Database = {
           difficulty: Database["public"]["Enums"]["Difficulty"]
           id: string
           slug: string
-          tags?: string[] | null
           title: string
           tutorialCategoryId?: string | null
           updatedAt: string
@@ -347,7 +375,6 @@ export type Database = {
           difficulty?: Database["public"]["Enums"]["Difficulty"]
           id?: string
           slug?: string
-          tags?: string[] | null
           title?: string
           tutorialCategoryId?: string | null
           updatedAt?: string

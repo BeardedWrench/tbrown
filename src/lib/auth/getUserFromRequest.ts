@@ -45,3 +45,18 @@ export async function getUserByID(id: string): Promise<DBUser | null> {
     role: dbUser.role.name,
   };
 }
+
+export async function getAllUsers(): Promise<DBUser[]> {
+  const users = await prisma.user.findMany({
+    include: { role: true },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return users.map((user) => ({
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    avatarUrl: user.avatarUrl,
+    role: user.role?.name ?? 'viewer',
+  }));
+}

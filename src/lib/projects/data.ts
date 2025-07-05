@@ -52,3 +52,12 @@ export async function getRecentProjects(limit = 3) {
     },
   });
 }
+
+export async function getProjects() {
+  return prisma.project.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      category: true,
+    },
+  });
+}
