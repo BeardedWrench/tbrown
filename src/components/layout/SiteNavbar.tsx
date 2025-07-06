@@ -50,7 +50,6 @@ export function SiteNavbar() {
           Terry Brown
         </Link>
 
-        {/* Desktop Nav */}
         <div className="hidden md:flex items-center space-x-6">
           {navLinks.map((link) => (
             <Link
@@ -88,7 +87,6 @@ export function SiteNavbar() {
           </DropdownMenu>
         </div>
 
-        {/* Mobile Nav */}
         <div className="flex md:hidden items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>{avatar}</DropdownMenuTrigger>

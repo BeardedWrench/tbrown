@@ -1,4 +1,3 @@
-// app/(admin)/admin/users/UsersClient.tsx
 'use client';
 
 import { DBUser } from '@/types/user';
