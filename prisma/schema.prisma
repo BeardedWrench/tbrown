@@ -96,6 +96,7 @@ model Setting {
   id        String   @id @default(cuid())
   key       String   @unique
   value     String
+  type      SettingType @default(STRING)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -128,4 +129,11 @@ model TutorialCategory {
   slug      String   @unique
   createdAt DateTime @default(now())
   tutorials Tutorial[]
+}
+
+enum SettingType {
+  STRING
+  BOOLEAN
+  NUMBER
+  JSON
 }

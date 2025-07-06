@@ -2,10 +2,10 @@
 
 import { SquarePen, Trash2 } from 'lucide-react';
 import Image from 'next/image';
-import AdminProjectCardPill from './AdminProjectCardPill';
 import { FaGithub } from 'react-icons/fa';
 import { CgWebsite } from 'react-icons/cg';
-import { ProjectWithCategory } from '@/types/projects';
+import { ProjectWithCategory } from '@/types/withCategories';
+import { Badge } from '@/components/ui/badge';
 
 interface Props {
   project: ProjectWithCategory;
@@ -27,7 +27,7 @@ export default function AdminProjectCard({ project }: Props) {
       </div>
       <div className="flex flex-wrap gap-2 my-3">
         {techStack.map((stack) => (
-          <AdminProjectCardPill key={stack} tech={stack} />
+          <Badge key={stack}>{stack.toUpperCase()}</Badge>
         ))}
       </div>
 

@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
-import { getBlogPostById } from '@/lib/blog/data';
+import { getBlogCategories, getBlogPostById } from '@/lib/blog/data';
 import BlogEditorForm from '../../components/BlogEditorForm';
-import { prisma } from '@/lib/prisma';
 import { PostCategory } from '@prisma/client';
 
 interface Props {
@@ -16,7 +15,8 @@ export default async function EditBlogPostPage(_: Props) {
   const post = await getBlogPostById(id);
   if (!post) return notFound();
 
-  const blogCategories: PostCategory[] = await prisma.postCategory.findMany();
+  const blogCategories: PostCategory[] = await getBlogCategories();
+
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-6">Edit Blog Post</h1>

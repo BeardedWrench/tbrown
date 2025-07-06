@@ -308,6 +308,7 @@ export type Database = {
           createdAt: string
           id: string
           key: string
+          type: Database["public"]["Enums"]["SettingType"]
           updatedAt: string
           value: string
         }
@@ -315,6 +316,7 @@ export type Database = {
           createdAt?: string
           id: string
           key: string
+          type?: Database["public"]["Enums"]["SettingType"]
           updatedAt: string
           value: string
         }
@@ -322,6 +324,7 @@ export type Database = {
           createdAt?: string
           id?: string
           key?: string
+          type?: Database["public"]["Enums"]["SettingType"]
           updatedAt?: string
           value?: string
         }
@@ -468,6 +471,7 @@ export type Database = {
     }
     Enums: {
       Difficulty: "BEGINNER" | "INTERMEDIATE" | "ADVANCED"
+      SettingType: "STRING" | "BOOLEAN" | "NUMBER" | "JSON"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -584,6 +588,7 @@ export const Constants = {
   public: {
     Enums: {
       Difficulty: ["BEGINNER", "INTERMEDIATE", "ADVANCED"],
+      SettingType: ["STRING", "BOOLEAN", "NUMBER", "JSON"],
     },
   },
 } as const

@@ -1,12 +1,9 @@
-import { createSupabaseServerClientFromHeaders } from '@/lib/supabase/server';
-import { prisma } from '@/lib/prisma'; // Assuming you export PrismaClient here
+import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
+import { getUserFromRequest } from '@/lib/auth/getUserFromRequest';
 
 export async function POST(req: Request) {
-  const supabase = await createSupabaseServerClientFromHeaders();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getUserFromRequest();
 
   if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

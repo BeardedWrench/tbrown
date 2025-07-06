@@ -1,14 +1,8 @@
-import { prisma } from '@/lib/prisma';
 import BlogClient from './BlogClient';
+import { getAllBlogPosts } from '@/lib/blog/data';
 
 export default async function AdminBlogPage() {
-  const posts = await prisma.post.findMany({
-    orderBy: { createdAt: 'desc' },
-    include: {
-      category: true,
-      author: true,
-    },
-  });
+  const posts = await getAllBlogPosts();
 
   return <BlogClient posts={posts} />;
 }

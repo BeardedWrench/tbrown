@@ -1,7 +1,7 @@
 'use client';
 
 import AdminProjectCard from './components/AdminProjectCard';
-import { ProjectWithCategory } from '@/types/projects';
+import { ProjectWithCategory } from '@/types/withCategories';
 
 interface Props {
   projects: ProjectWithCategory[];

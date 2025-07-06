@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { prisma } from '@/lib/prisma';
 
 export async function getBlogPosts({
@@ -17,7 +18,7 @@ export async function getBlogPosts({
       take: pageSize,
       skip: (page - 1) * pageSize,
       orderBy: { createdAt: 'desc' },
-      include: { category: true },
+      include: { category: true, tags: true },
     }),
     prisma.post.count({ where }),
   ]);
@@ -91,5 +92,30 @@ export async function getRecentBlogPosts(limit = 3) {
 export async function getBlogPostById(id: string) {
   return prisma.post.findUnique({
     where: { id },
+    include: { tags: true, author: true },
+  });
+}
+
+export async function getAllBlogPosts() {
+  return prisma.post.findMany({
+    orderBy: { createdAt: 'desc' },
+    include: {
+      category: true,
+      author: true,
+      tags: true,
+    },
+  });
+}
+
+export async function createBlogPost(post: any) {
+  return prisma.post.create({
+    data: post,
+  });
+}
+
+export async function updateBlogPostById(id: string, data: any) {
+  return await prisma.post.update({
+    where: { id },
+    data,
   });
 }

@@ -1,17 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  deleteTutorialById,
+  getTutorialById,
+  updateTutorialById,
+} from '@/lib/tutorials/data';
 import { getUserFromRequest } from '@/lib/auth/getUserFromRequest';
-import { getBlogPostById, updateBlogPostById } from '@/lib/blog/data';
 
 const schema = z.object({
   title: z.string().min(3),
-  excerpt: z.string().optional(),
+  difficulty: z.string().optional(),
   content: z.string().min(10),
-  coverImage: z.string().optional(),
-  published: z.boolean().default(false),
-  postCategoryId: z.string().uuid().optional(),
+  tutorialCategoryId: z.string().uuid().optional(),
+  authorId: z.string().uuid(),
 });
 
 export async function DELETE(
@@ -19,7 +21,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    await prisma.post.delete({ where: { id: params.id } });
+    await deleteTutorialById(params.id);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
@@ -46,21 +48,20 @@ export async function PUT(
     );
   }
 
-  const post = await getBlogPostById(params.id);
+  const tutorial = await getTutorialById(params.id);
 
-  if (!post) {
+  if (!tutorial) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  if (post.authorId !== user.id) {
+  if (tutorial.authorId !== user.id) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const updated = await updateBlogPostById(params.id, {
+  const updated = await updateTutorialById(params.id, {
     ...parsed.data,
     updatedAt: new Date(),
-    postCategoryId: parsed.data.postCategoryId,
+    tutorialCategoryId: parsed.data.tutorialCategoryId,
   });
-
   return NextResponse.json(updated);
 }
