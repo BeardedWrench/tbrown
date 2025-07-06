@@ -39,3 +39,36 @@ export async function createTutorial(tutorial: any) {
     data: tutorial,
   });
 }
+
+export async function getTutorials({
+  search,
+  category,
+}: {
+  search?: string;
+  category?: string;
+}) {
+  return prisma.tutorial.findMany({
+    where: {
+      AND: [
+        search
+          ? {
+              OR: [{ title: { contains: search, mode: 'insensitive' } }],
+            }
+          : {},
+        category ? { category: { slug: category } } : {},
+      ],
+    },
+    orderBy: { createdAt: 'desc' },
+    include: { category: true },
+  });
+}
+export async function getTutorialBySlug(slug: string) {
+  return prisma.tutorial.findUnique({
+    where: { slug },
+    include: {
+      category: true,
+      tags: true,
+      author: true,
+    },
+  });
+}

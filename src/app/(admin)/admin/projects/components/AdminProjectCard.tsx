@@ -6,6 +6,8 @@ import { FaGithub } from 'react-icons/fa';
 import { CgWebsite } from 'react-icons/cg';
 import { ProjectWithCategory } from '@/types/withCategories';
 import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Props {
   project: ProjectWithCategory;
@@ -13,6 +15,17 @@ interface Props {
 
 export default function AdminProjectCard({ project }: Props) {
   const { coverImage, title, url, repo, techStack, category } = project;
+  const router = useRouter();
+
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this project?')) return;
+    const res = await fetch(`/api/admin/projects/${id}`, {
+      method: 'DELETE',
+    });
+    if (res.ok) {
+      router.refresh();
+    }
+  };
 
   return (
     <div className="flex flex-col justify-between h-full rounded-xl p-4 bg-white dark:bg-neutral-900 shadow-sm border border-neutral-200 dark:border-neutral-800">
@@ -72,12 +85,18 @@ export default function AdminProjectCard({ project }: Props) {
 
       {/* Sticky footer icons */}
       <div className="flex justify-between items-center pt-4 border-t border-neutral-200 dark:border-neutral-700 mt-auto">
-        <button className="p-2 hover:bg-red-100 dark:hover:bg-red-900 rounded transition">
+        <button
+          className="p-2 hover:bg-red-100 dark:hover:bg-red-900 rounded transition"
+          onClick={() => handleDelete(project.id)}
+        >
           <Trash2 size={18} className="text-red-600" />
         </button>
-        <button className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition">
+        <Link
+          href={`/admin/projects/edit/${project.id}`}
+          className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900 rounded transition"
+        >
           <SquarePen size={18} className="text-blue-600" />
-        </button>
+        </Link>
       </div>
     </div>
   );

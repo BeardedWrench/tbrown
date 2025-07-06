@@ -7,3 +7,12 @@ export type ProjectWithCategory = Project & {
 export type TutorialWithCategory = Tutorial & {
   category: ProjectCategory | null;
 };
+
+export type CategoryType = 'post' | 'project' | 'tutorial';
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  createdAt: string;
+}

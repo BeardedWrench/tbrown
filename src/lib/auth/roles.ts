@@ -1,5 +1,6 @@
 import { DBUser } from '@/types/user';
 import type { Role as PrismaRole } from '@prisma/client';
+import { prisma } from '../prisma';
 
 export type Role = PrismaRole['name'];
 
@@ -13,6 +14,12 @@ export function hasRole(
   return (
     roleHierarchy.indexOf(user.role as Role) >= roleHierarchy.indexOf(required)
   );
+}
+
+export async function getAllRoles() {
+  return prisma.role.findMany({
+    orderBy: { name: 'asc' },
+  });
 }
 
 export function isAdmin(user: DBUser | null | undefined): boolean {

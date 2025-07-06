@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export async function getProjectCategories() {
   return prisma.projectCategory.findMany({
@@ -59,5 +60,30 @@ export async function getProjects() {
     include: {
       category: true,
     },
+  });
+}
+
+export async function getProjectById(id: string) {
+  return prisma.project.findUnique({
+    where: { id },
+  });
+}
+
+export async function deleteProjectByid(id: string) {
+  return prisma.project.delete({
+    where: { id },
+  });
+}
+export async function createProject(data: Prisma.ProjectCreateInput) {
+  return prisma.project.create({ data });
+}
+
+export async function updateProject(
+  id: string,
+  data: Prisma.ProjectUpdateInput
+) {
+  return prisma.project.update({
+    where: { id },
+    data,
   });
 }

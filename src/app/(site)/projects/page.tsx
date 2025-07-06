@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getProjectCategories } from '@/lib/projects/data';
 import Link from 'next/link';
 
@@ -8,7 +9,7 @@ export default async function ProjectsPage() {
     <div className="mx-auto max-w-5xl px-4 py-10">
       <h1 className="text-3xl font-bold mb-6">Project Categories</h1>
       <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
-        {categories.map((cat) => (
+        {categories.map((cat: any) => (
           <Link
             key={cat.id}
             href={`/projects/${cat.slug}`}
