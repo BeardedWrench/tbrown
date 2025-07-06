@@ -4,7 +4,10 @@
 import { useEffect, useState } from 'react';
 import { Dialog } from '@/components/ui/dialog';
 import Image from 'next/image';
-import { listImagesFromBucket, getPublicImageUrl } from '@/lib/supabase/upload';
+import {
+  getPublicImageUrl,
+  listImagesFromBucket,
+} from '@/lib/supabase/media-server';
 
 interface Props {
   open: boolean;

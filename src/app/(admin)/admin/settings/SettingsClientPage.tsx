@@ -1,64 +1,18 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { SettingType } from '@prisma/client';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { getAllSettings } from '@/lib/settings/data';
+import { SettingType } from '@prisma/client';
 
 interface Setting {
   id: string;
   key: string;
   value: string;
-}
-
-const mock1 = {
-  id: '123',
-  key: 'onTest',
-  value: 'true',
-  type: 'BOOLEAN',
-};
-const mock2 = {
-  id: '1234',
-  key: 'canAccess',
-  value: 'false',
-  type: 'BOOLEAN',
-};
-const mock3 = {
-  id: '12345',
-  key: 'canLogin',
-  value: 'true',
-  type: 'BOOLEAN',
-};
-const mock4 = {
-  id: '1234577',
-  key: 'whoAdmin',
-  value: 'bob',
-  type: 'STRING',
-};
-const mock5 = {
-  id: '123457733',
-  key: 'loginAttemptsAllowed',
-  value: '6',
-  type: 'NUMBER',
-};
-const mock6 = {
-  id: '123457733222',
-  key: 'defaultConfig',
-  value: '{"key": "value"}',
-  type: 'JSON',
-};
-const mockSettings: Setting[] = [mock1, mock2, mock3, mock4, mock5, mock6];
-
-interface Setting {
-  id: string;
-  key: string;
-  value: string;
-  type: string;
+  type: SettingType;
 }
 
 export default function SettingsClientPage() {
@@ -66,11 +20,22 @@ export default function SettingsClientPage() {
   const [newKey, setNewKey] = useState('');
   const [newValue, setNewValue] = useState('');
   const [newType, setNewType] = useState<SettingType>('BOOLEAN');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/admin/settings')
-      .then((res) => res.json())
-      .then((data) => setSettings(data));
+    async function fetchSettings() {
+      try {
+        const res = await fetch('/api/admin/settings');
+        const data = await res.json();
+        setSettings(data);
+      } catch (err) {
+        console.error('Error loading settings:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchSettings();
   }, []);
 
   const handleUpdate = async (
@@ -83,6 +48,7 @@ export default function SettingsClientPage() {
       method: 'PUT',
       body: JSON.stringify({ key, value, type }),
     });
+
     setSettings((prev) =>
       prev.map((s) => (s.id === id ? { ...s, key, value } : s))
     );
@@ -99,7 +65,7 @@ export default function SettingsClientPage() {
       body: JSON.stringify({ key: newKey, value: newValue, type: newType }),
     });
     const data = await res.json();
-    setSettings((prev) => [...prev, data.setting]);
+    setSettings((prev) => [...prev, data]);
     setNewKey('');
     setNewValue('');
     setNewType('BOOLEAN');
@@ -122,41 +88,12 @@ export default function SettingsClientPage() {
           />
         );
       case 'NUMBER':
-        return (
-          <Input
-            type="number"
-            defaultValue={setting.value}
-            onBlur={(e) =>
-              handleUpdate(
-                setting.id,
-                setting.key,
-                e.target.value,
-                setting.type
-              )
-            }
-          />
-        );
-      case 'JSON':
-        return (
-          <Input
-            type="text"
-            defaultValue={setting.value}
-            placeholder='{"key":"value"}'
-            onBlur={(e) =>
-              handleUpdate(
-                setting.id,
-                setting.key,
-                e.target.value,
-                setting.type
-              )
-            }
-          />
-        );
       case 'STRING':
+      case 'JSON':
       default:
         return (
           <Input
-            type="text"
+            type={setting.type === 'NUMBER' ? 'number' : 'text'}
             defaultValue={setting.value}
             onBlur={(e) =>
               handleUpdate(
@@ -178,29 +115,42 @@ export default function SettingsClientPage() {
           <CardTitle className="text-2xl">Site Settings</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          {settings.map((setting) => (
-            <div
-              key={setting.id}
-              className="grid grid-cols-1 md:grid-cols-3 items-center gap-4 border-b pb-4"
-            >
-              <div>
-                <Label className="text-sm font-semibold">{setting.key}</Label>
-                <p className="text-xs text-muted-foreground">
-                  Type: {setting.type}
-                </p>
-              </div>
-              <div>{renderValueInput(setting)}</div>
-              <div className="text-right">
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={() => handleDelete(setting.id)}
-                >
-                  Delete
-                </Button>
-              </div>
+          {loading ? (
+            <div className="space-y-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="animate-pulse h-10 bg-muted rounded-md"
+                />
+              ))}
             </div>
-          ))}
+          ) : settings.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No settings found.</p>
+          ) : (
+            settings.map((setting) => (
+              <div
+                key={setting.id}
+                className="grid grid-cols-1 md:grid-cols-3 items-center gap-4 border-b pb-4"
+              >
+                <div>
+                  <Label className="text-sm font-semibold">{setting.key}</Label>
+                  <p className="text-xs text-muted-foreground">
+                    Type: {setting.type}
+                  </p>
+                </div>
+                <div>{renderValueInput(setting)}</div>
+                <div className="text-right">
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => handleDelete(setting.id)}
+                  >
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            ))
+          )}
         </CardContent>
       </Card>
 
