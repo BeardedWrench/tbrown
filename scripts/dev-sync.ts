@@ -12,7 +12,7 @@ function run(cmd: string, label: string) {
   }
 }
 
-const SUPABASE_PROJECT_ID = '<project-id-here>';
+const SUPABASE_PROJECT_ID = '<project id here>';
 
 run('npx prisma generate', 'Prisma generate');
 run('npx prisma db push', 'Prisma DB push');

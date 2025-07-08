@@ -5,12 +5,9 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "sync": "ts-node scripts/dev-sync.ts",
-    "build": "npm run generate:types && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@auth/supabase-adapter": "^1.10.0",
