@@ -41,17 +41,21 @@ export function Blog() {
       </h1>
       <BlogFilter categories={data.categories} selected={category ?? null} />
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
-        {data.posts.map((post) => (
-          <BlogCard
-            key={post.id}
-            title={post.title}
-            slug={post.slug}
-            excerpt={post.excerpt ?? ''}
-            createdAt={post.createdAt.toString()}
-            coverImage={post.coverImage}
-            tags={[]} // Add tags later
-          />
-        ))}
+        {data.posts.length === 0 ? (
+          <p className="text-muted-foreground">No posts yet.</p>
+        ) : (
+          data.posts.map((post) => (
+            <BlogCard
+              key={post.id}
+              title={post.title}
+              slug={post.slug}
+              excerpt={post.excerpt ?? ''}
+              createdAt={post.createdAt.toString()}
+              coverImage={post.coverImage}
+              tags={[]} // Add tags later
+            />
+          ))
+        )}
       </div>
       <BlogPagination currentPage={page} totalPages={totalPages} />
     </div>

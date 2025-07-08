@@ -1,4 +1,9 @@
-import { deleteProjectByid, updateProject } from '@/lib/projects/data';
+import { getUserFromRequest } from '@/lib/auth/getUserFromRequest';
+import {
+  deleteProjectByid,
+  getProjectById,
+  updateProject,
+} from '@/lib/projects/data';
 import { generateUniqueSlug } from '@/lib/utils/slugify';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
@@ -6,8 +11,14 @@ import { z } from 'zod';
 const updateSchema = z.object({
   title: z.string().min(1).optional(),
   description: z.string().min(5).optional(),
-  url: z.string().url().optional(),
-  repo: z.string().url().optional(),
+  url: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.string().url().optional()
+  ),
+  repo: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.string().url().optional()
+  ),
   techStack: z.array(z.string()).optional(),
   coverImage: z.string().optional(),
   featured: z.boolean().optional(),
@@ -19,13 +30,26 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const user = await getUserFromRequest();
+
+  if (!user) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const json = await req.json();
   const parsed = updateSchema.safeParse(json);
+
   if (!parsed.success) {
     return NextResponse.json(
       { error: parsed.error.flatten() },
       { status: 400 }
     );
+  }
+
+  const project = await getProjectById(params.id);
+
+  if (!project) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
   const { title, slug, ...rest } = parsed.data;

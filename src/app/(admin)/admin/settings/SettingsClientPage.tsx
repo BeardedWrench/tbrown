@@ -7,6 +7,13 @@ import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { SettingType } from '@prisma/client';
+import JsonEditor from '@/components/editors/JsonEditor';
+import MdEditor from 'react-markdown-editor-lite';
+import MarkdownIt from 'markdown-it';
+const mdParser = new MarkdownIt({
+  html: true,
+});
+import 'react-markdown-editor-lite/lib/index.css';
 
 interface Setting {
   id: string;
@@ -17,10 +24,11 @@ interface Setting {
 
 export default function SettingsClientPage() {
   const [settings, setSettings] = useState<Setting[]>([]);
-  const [newKey, setNewKey] = useState('');
-  const [newValue, setNewValue] = useState('');
-  const [newType, setNewType] = useState<SettingType>('BOOLEAN');
+  const [editMap, setEditMap] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
+  const [newKey, setNewKey] = useState('');
+  const [newValue, setNewValue] = useState<string | boolean>('');
+  const [newType, setNewType] = useState<SettingType>('BOOLEAN');
 
   useEffect(() => {
     async function fetchSettings() {
@@ -44,6 +52,15 @@ export default function SettingsClientPage() {
     value: string,
     type: string
   ) => {
+    if (type === 'JSON') {
+      try {
+        JSON.parse(value);
+      } catch {
+        alert('Invalid JSON');
+        return;
+      }
+    }
+
     await fetch(`/api/admin/settings/${id}`, {
       method: 'PUT',
       body: JSON.stringify({ key, value, type }),
@@ -52,6 +69,7 @@ export default function SettingsClientPage() {
     setSettings((prev) =>
       prev.map((s) => (s.id === id ? { ...s, key, value } : s))
     );
+    setEditMap((prev) => ({ ...prev, [id]: false }));
   };
 
   const handleDelete = async (id: string) => {
@@ -60,9 +78,10 @@ export default function SettingsClientPage() {
   };
 
   const handleAdd = async () => {
+    const value = newType === 'BOOLEAN' ? Boolean(newValue) : newValue;
     const res = await fetch('/api/admin/settings', {
       method: 'POST',
-      body: JSON.stringify({ key: newKey, value: newValue, type: newType }),
+      body: JSON.stringify({ key: newKey, value, type: newType }),
     });
     const data = await res.json();
     setSettings((prev) => [...prev, data]);
@@ -71,7 +90,59 @@ export default function SettingsClientPage() {
     setNewType('BOOLEAN');
   };
 
+  const renderNewValueInput = () => {
+    switch (newType) {
+      case 'BOOLEAN':
+        return (
+          <div>
+            <Label htmlFor="value">Value</Label>
+            <Switch
+              checked={newValue === true}
+              onCheckedChange={(val) => setNewValue(val)}
+            />
+          </div>
+        );
+      case 'JSON':
+        return (
+          <div className="col-span-full">
+            <Label htmlFor="value">Value</Label>
+            <JsonEditor
+              value={typeof newValue === 'string' ? newValue : '{}'}
+              onChange={(val) => setNewValue(val)}
+            />
+          </div>
+        );
+      case 'STRING':
+        return (
+          <div className="col-span-full">
+            <Label htmlFor="value">Value</Label>
+            <MdEditor
+              value={typeof newValue === 'string' ? newValue : ''}
+              style={{ height: '400px', width: '1200px' }}
+              renderHTML={(text) => mdParser.render(text)}
+              onChange={({ text }) => setNewValue(text)}
+            />
+          </div>
+        );
+      case 'NUMBER':
+        return (
+          <div>
+            <Label htmlFor="value">Value</Label>
+            <Input
+              type="number"
+              value={newValue as string}
+              onChange={(e) => setNewValue(e.target.value)}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
   const renderValueInput = (setting: Setting) => {
+    const isEditing = editMap[setting.id];
+
     switch (setting.type) {
       case 'BOOLEAN':
         return (
@@ -87,13 +158,58 @@ export default function SettingsClientPage() {
             }
           />
         );
-      case 'NUMBER':
-      case 'STRING':
       case 'JSON':
-      default:
-        return (
+        return isEditing ? (
+          <JsonEditor
+            value={setting.value}
+            onChange={(val) =>
+              setSettings((prev) =>
+                prev.map((s) =>
+                  s.id === setting.id ? { ...s, value: val } : s
+                )
+              )
+            }
+          />
+        ) : (
+          <pre className="text-xs bg-neutral-100 dark:bg-neutral-800 rounded p-2 overflow-x-auto">
+            {setting.value}
+          </pre>
+        );
+      case 'STRING':
+        return isEditing ? (
+          setting.value.length > 60 ? (
+            <MdEditor
+              value={setting.value}
+              style={{ height: '400px', width: '800px' }}
+              renderHTML={(text) => mdParser.render(text)}
+              onChange={({ text }) =>
+                setSettings((prev) =>
+                  prev.map((s) =>
+                    s.id === setting.id ? { ...s, value: text } : s
+                  )
+                )
+              }
+            />
+          ) : (
+            <Input
+              defaultValue={setting.value}
+              onBlur={(e) =>
+                handleUpdate(
+                  setting.id,
+                  setting.key,
+                  e.target.value,
+                  setting.type
+                )
+              }
+            />
+          )
+        ) : (
+          <span className="text-sm text-muted-foreground">{setting.value}</span>
+        );
+      case 'NUMBER':
+        return isEditing ? (
           <Input
-            type={setting.type === 'NUMBER' ? 'number' : 'text'}
+            type="number"
             defaultValue={setting.value}
             onBlur={(e) =>
               handleUpdate(
@@ -104,12 +220,16 @@ export default function SettingsClientPage() {
               )
             }
           />
+        ) : (
+          <span>{setting.value}</span>
         );
+      default:
+        return null;
     }
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-8">
+    <div className="w-fit max-w-full overflow-x-auto mx-auto p-6 space-y-8">
       <Card>
         <CardHeader>
           <CardTitle className="text-2xl">Site Settings</CardTitle>
@@ -130,7 +250,7 @@ export default function SettingsClientPage() {
             settings.map((setting) => (
               <div
                 key={setting.id}
-                className="grid grid-cols-1 md:grid-cols-3 items-center gap-4 border-b pb-4"
+                className="grid grid-cols-1 md:grid-cols-4 items-center border-b pb-4"
               >
                 <div>
                   <Label className="text-sm font-semibold">{setting.key}</Label>
@@ -138,8 +258,39 @@ export default function SettingsClientPage() {
                     Type: {setting.type}
                   </p>
                 </div>
-                <div>{renderValueInput(setting)}</div>
-                <div className="text-right">
+                <div className="md:col-span-2">{renderValueInput(setting)}</div>
+                <div className="flex justify-end space-x-2">
+                  {setting.type !== 'BOOLEAN' &&
+                    (!editMap[setting.id] ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setEditMap((prev) => ({
+                            ...prev,
+                            [setting.id]: true,
+                          }))
+                        }
+                      >
+                        Edit
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() =>
+                          handleUpdate(
+                            setting.id,
+                            setting.key,
+                            setting.value,
+                            setting.type
+                          )
+                        }
+                      >
+                        Save
+                      </Button>
+                    ))}
+
                   <Button
                     variant="destructive"
                     size="sm"
@@ -169,15 +320,6 @@ export default function SettingsClientPage() {
             />
           </div>
           <div>
-            <Label htmlFor="value">Value</Label>
-            <Input
-              id="value"
-              placeholder="true"
-              value={newValue}
-              onChange={(e) => setNewValue(e.target.value)}
-            />
-          </div>
-          <div>
             <Label htmlFor="type">Type</Label>
             <select
               className="w-full border p-2 rounded-md"
@@ -190,6 +332,7 @@ export default function SettingsClientPage() {
               <option value="JSON">JSON</option>
             </select>
           </div>
+          {renderNewValueInput()}
           <div className="md:col-span-3 text-right">
             <Button onClick={handleAdd}>Add Setting</Button>
           </div>

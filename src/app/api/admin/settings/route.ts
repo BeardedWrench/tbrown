@@ -6,7 +6,7 @@ import { getUserFromRequest } from '@/lib/auth/getUserFromRequest';
 const schema = z.object({
   key: z.string().min(3),
   value: z.string().min(1),
-  type: z.enum(['string', 'boolean']),
+  type: z.enum(['STRING', 'BOOLEAN', 'JSON', 'NUMBER']),
 });
 
 export async function POST(req: NextRequest) {

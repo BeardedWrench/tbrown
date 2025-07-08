@@ -60,7 +60,7 @@ export default function NewProjectClientPage({ categories }: Props) {
       router.push('/admin/projects');
     } else {
       const { error } = await res.json();
-      setError(error ?? 'Failed to create project');
+      setError(error?.message ?? 'Failed to create project');
     }
   };
 
@@ -108,6 +108,7 @@ export default function NewProjectClientPage({ categories }: Props) {
               width={600}
               height={300}
               className="rounded mb-2"
+              style={{ height: 'auto' }}
             />
           )}
           <input
@@ -162,7 +163,11 @@ export default function NewProjectClientPage({ categories }: Props) {
           {loading ? 'Saving...' : 'Save Project'}
         </button>
 
-        {error && <p className="text-red-600">{error}</p>}
+        {error && (
+          <pre className="text-red-600 whitespace-pre-wrap">
+            {typeof error === 'string' ? error : JSON.stringify(error, null, 2)}
+          </pre>
+        )}
       </div>
     </div>
   );

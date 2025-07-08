@@ -7,8 +7,14 @@ import { generateUniqueSlug } from '@/lib/utils/slugify';
 const schema = z.object({
   title: z.string().min(1),
   description: z.string().min(5),
-  url: z.string().url().optional(),
-  repo: z.string().url().optional(),
+  url: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.string().url().optional()
+  ),
+  repo: z.preprocess(
+    (val) => (val === '' ? undefined : val),
+    z.string().url().optional()
+  ),
   techStack: z.array(z.string()).optional(),
   coverImage: z.string().optional(),
   featured: z.boolean().default(false),
@@ -22,27 +28,40 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await getUserFromRequest();
-  if (!user)
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  try {
+    const user = await getUserFromRequest();
+    if (!user)
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const json = await req.json();
-  const parsed = schema.safeParse(json);
-  if (!parsed.success) {
+    const json = await req.json();
+    const parsed = schema.safeParse(json);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+
+    const slug =
+      parsed.data.slug || (await generateUniqueSlug(parsed.data.title));
+
+    const { projectCategoryId, ...rest } = parsed.data;
+
+    const project = await createProject({
+      ...rest,
+      slug,
+      author: { connect: { id: user.id } },
+      category: projectCategoryId
+        ? { connect: { id: projectCategoryId } }
+        : undefined,
+    });
+
+    return NextResponse.json(project);
+  } catch (err) {
+    console.error('[PROJECT_CREATE_ERROR]', err);
     return NextResponse.json(
-      { error: parsed.error.flatten() },
-      { status: 400 }
+      { error: 'Internal Server Error' },
+      { status: 500 }
     );
   }
-
-  const slug =
-    parsed.data.slug || (await generateUniqueSlug(parsed.data.title));
-
-  const project = await createProject({
-    ...parsed.data,
-    slug,
-    author: { connect: { id: user.id } },
-  });
-
-  return NextResponse.json(project);
 }

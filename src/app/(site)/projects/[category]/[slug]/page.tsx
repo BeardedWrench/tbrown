@@ -46,8 +46,8 @@ export default async function ProjectDetailPage(_: Props) {
             src={project.coverImage}
             alt={project.title}
             width={800}
-            height={400}
-            className="rounded-md object-cover w-full h-auto"
+            height={600}
+            className="rounded-md w-full object-cover"
           />
         </div>
       )}
