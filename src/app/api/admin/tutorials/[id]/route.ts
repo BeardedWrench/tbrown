@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
 import {
@@ -18,10 +17,11 @@ const schema = z.object({
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    await deleteTutorialById(params.id);
+    await deleteTutorialById(id);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
@@ -30,8 +30,9 @@ export async function DELETE(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const user = await getUserFromRequest();
 
   if (!user) {
@@ -48,7 +49,7 @@ export async function PUT(
     );
   }
 
-  const tutorial = await getTutorialById(params.id);
+  const tutorial = await getTutorialById(id);
 
   if (!tutorial) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -58,7 +59,7 @@ export async function PUT(
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const updated = await updateTutorialById(params.id, {
+  const updated = await updateTutorialById(id, {
     ...parsed.data,
     updatedAt: new Date(),
     tutorialCategoryId: parsed.data.tutorialCategoryId,

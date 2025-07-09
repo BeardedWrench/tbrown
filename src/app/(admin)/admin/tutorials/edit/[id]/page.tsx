@@ -8,12 +8,11 @@ import {
 import { redirect } from 'next/navigation';
 import TutorialForm from '../../components/TutorialForm';
 
-export default async function EditTutorialPage({
-  params,
-}: {
-  params: { id: string };
+export default async function AdminTutorialEditPage(props: {
+  params: Promise<{ id: string }>;
 }) {
-  const tutorial = await getTutorialById(params.id);
+  const { id } = await props.params;
+  const tutorial = await getTutorialById(id);
   const categories = await getTutorialCategories();
   const tags = await getAllTags();
 
@@ -21,7 +20,7 @@ export default async function EditTutorialPage({
 
   async function handleSubmit(data: any) {
     'use server';
-    await updateTutorialById(params.id, data);
+    await updateTutorialById(id, data);
     redirect('/admin/tutorials');
   }
 

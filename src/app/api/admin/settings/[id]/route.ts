@@ -15,10 +15,11 @@ const schema = z.object({
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    await deleteSetting(params.id);
+    await deleteSetting(id);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
@@ -27,8 +28,9 @@ export async function DELETE(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const user = await getUserFromRequest();
 
   if (!user) {
@@ -45,13 +47,13 @@ export async function PUT(
     );
   }
 
-  const setting = await getSettingById(params.id);
+  const setting = await getSettingById(id);
 
   if (!setting) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  const updated = await updateSetting(params.id, parsed.data);
+  const updated = await updateSetting(id, parsed.data);
 
   return NextResponse.json(updated);
 }

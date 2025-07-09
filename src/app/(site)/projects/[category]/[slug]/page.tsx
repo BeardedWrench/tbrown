@@ -3,12 +3,10 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 
-interface Props {
-  params: { category: string; slug: string };
-}
-
-export default async function ProjectDetailPage(_: Props) {
-  const { slug, category } = await (async () => _?.params ?? {})();
+export default async function ProjectDetailPage(props: {
+  params: Promise<{ slug: string; category: string }>;
+}) {
+  const { slug, category } = await props.params;
 
   if (typeof slug !== 'string') return notFound();
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { NextRequest, NextResponse } from 'next/server';
@@ -16,10 +15,11 @@ const schema = z.object({
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    await prisma.post.delete({ where: { id: params.id } });
+    await prisma.post.delete({ where: { id: id } });
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
@@ -28,8 +28,9 @@ export async function DELETE(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const user = await getUserFromRequest();
 
   if (!user) {
@@ -46,7 +47,7 @@ export async function PUT(
     );
   }
 
-  const post = await getBlogPostById(params.id);
+  const post = await getBlogPostById(id);
 
   if (!post) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -56,7 +57,7 @@ export async function PUT(
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
-  const updated = await updateBlogPostById(params.id, {
+  const updated = await updateBlogPostById(id, {
     ...parsed.data,
     updatedAt: new Date(),
     postCategoryId: parsed.data.postCategoryId,

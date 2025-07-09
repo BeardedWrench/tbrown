@@ -5,12 +5,10 @@ import {
 import { notFound } from 'next/navigation';
 import ProjectCard from '../components/ProjectCard';
 
-interface Props {
-  params: { category: string };
-}
-
-export default async function ProjectsByCategoryPage(_: Props) {
-  const { category } = await (async () => _?.params ?? {})();
+export default async function CategoriesPage(props: {
+  params: Promise<{ category: string }>;
+}) {
+  const { category } = await props.params;
 
   if (typeof category !== 'string') return notFound();
 

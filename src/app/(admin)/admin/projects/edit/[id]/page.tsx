@@ -4,13 +4,10 @@ import { ProjectCategory } from '@prisma/client';
 import ProjectEditorForm from '../../components/ProjectEditorForm';
 import { getAllCategories } from '@/lib/categories/data';
 
-interface Props {
-  params: { id?: string };
-}
-
-export default async function EditProjectPage({ params }: Props) {
-  const id = params?.id;
-  if (!id) return notFound();
+export default async function EditProjectPage(props: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await props.params;
 
   const project = await getProjectById(id);
   if (!project) return notFound();

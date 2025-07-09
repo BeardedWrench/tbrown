@@ -6,12 +6,11 @@ import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { formatDate } from '@/lib/utils';
 
-export default async function TutorialDetailPage({
-  params,
-}: {
-  params: { slug: string };
+export default async function TutorialsDetailPage(props: {
+  params: Promise<{ slug: string }>;
 }) {
-  const tutorial = await getTutorialBySlug(params.slug);
+  const { slug } = await props.params;
+  const tutorial = await getTutorialBySlug(slug);
   if (!tutorial) return notFound();
 
   return (

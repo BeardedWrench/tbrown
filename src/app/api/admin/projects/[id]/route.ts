@@ -28,8 +28,9 @@ const updateSchema = z.object({
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   const user = await getUserFromRequest();
 
   if (!user) {
@@ -46,7 +47,7 @@ export async function PUT(
     );
   }
 
-  const project = await getProjectById(params.id);
+  const project = await getProjectById(id);
 
   if (!project) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
@@ -56,7 +57,7 @@ export async function PUT(
   const finalSlug =
     slug || (title ? await generateUniqueSlug(title) : undefined);
 
-  const updated = await updateProject(params.id, {
+  const updated = await updateProject(id, {
     ...rest,
     ...(title && { title }),
     ...(finalSlug && { slug: finalSlug }),
@@ -67,10 +68,11 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    await deleteProjectByid(params.id);
+    await deleteProjectByid(id);
     return NextResponse.json({ success: true });
   } catch {
     return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });

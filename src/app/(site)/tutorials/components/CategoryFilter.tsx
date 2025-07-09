@@ -10,10 +10,11 @@ type Category = {
   slug: string;
 };
 
-export default function CategoryFilter({ selected }: { selected: string }) {
+export default function CategoryFilter() {
   const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const selected = searchParams.get('category') || '';
 
   useEffect(() => {
     fetch('/api/admin/tutorial-categories')

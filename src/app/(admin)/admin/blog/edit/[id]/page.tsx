@@ -4,14 +4,10 @@ import BlogEditorForm from '../../components/BlogEditorForm';
 import { PostCategory } from '@prisma/client';
 import { getAllCategories } from '@/lib/categories/data';
 
-interface Props {
-  params: { id?: string };
-}
-
-export default async function EditBlogPostPage(_: Props) {
-  const { id } = await (async () => _?.params ?? {})();
-
-  if (typeof id !== 'string') return notFound();
+export default async function AdminEditBlogPage(props: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await props.params;
 
   const post = await getBlogPostById(id);
   if (!post) return notFound();
