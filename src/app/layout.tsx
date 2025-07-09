@@ -11,7 +11,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'Terry Brown — Developer Portfolio',
-  description: 'Personal site, blog, tools, and admin dashboard',
+  description: 'Personal site, blog, tools',
 };
 
 export default function RootLayout({
